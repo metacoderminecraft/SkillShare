@@ -1,0 +1,22 @@
+body, html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+input[type=text], input[type=email], input[type=password], textarea {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    width: 80%;
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#login-container, #dashboard, #profileEdit, #offerCreation, #searchResults, #matchDetails {
+    margin-top: 20px;
+}
