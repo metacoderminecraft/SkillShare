@@ -1,11 +1,10 @@
-//https://github.com/mohammad-taheri1/Book-Store-MERN-Stack
+//stores user information, credentials, skills
 
 import mongoose from "mongoose";
 
 const bookSchema = mongoose.bookSchema(
     {
-        //test stuff
-        title: {
+        username: {
             type: String,
             require: true
         }
@@ -15,5 +14,5 @@ const bookSchema = mongoose.bookSchema(
     }
 );
 
-export const bookModel = mongoose.model("bookModel", bookSchema)
+export const userModel = mongoose.model("userModel", bookSchema)
 
