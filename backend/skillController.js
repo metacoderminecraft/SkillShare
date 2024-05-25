@@ -1,1 +1,0 @@
-//Manages skill offerings, searches, and matches

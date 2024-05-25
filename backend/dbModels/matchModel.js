@@ -2,9 +2,13 @@
 
 import mongoose from "mongoose";
 
-const bookSchema = mongoose.bookSchema(
+const bookSchema = mongoose.Schema(
     {
-        match: {
+        user1: {
+            type: String,
+            require: true
+        },
+        user2: {
             type: String,
             require: true
         },

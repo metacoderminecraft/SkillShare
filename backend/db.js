@@ -1,14 +1,19 @@
 //Manages connections and operations with the database 
 //https://github.com/mohammad-taheri1/Book-Store-MERN-Stack
 
-import router from "./routes/userRoutes.js";
+import matchRoutes from "./routes/matchRoutes.js";
 import { MongoDBURL, PORT } from "./config.js";
+import express from "express";
+import cors from 'cors';
+import mongoose from "mongoose";
 
 const app = express();
 
 app.use(express.json());
 
-app.use("/books", router);
+app.use(cors());
+
+app.use("/books", matchRoutes);
 
 mongoose
   .connect(MongoDBURL)
