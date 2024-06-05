@@ -7,14 +7,14 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
     const [loading, setLoading] = useState(false);
-    const [books, setBooks] = useState([]);
+    const [matches, setMatches] = useState([]);
 
     useEffect(() => {
         setLoading(true);
         axios
-        .get("http://localhost:1155/books")
+        .get("http://localhost:1155/matches")
         .then((response) => {
-            setBooks(response.data.data);
+            setMatches(response.data.data);
             setLoading(false);
         })
         .catch((error) => {
@@ -27,7 +27,7 @@ const Home = () => {
         <div className='p-4'>
             <div className='flex justify-between items-center'>
                 <h1 className='text-2xl my-8'>Matches</h1>
-                <Link to={"/books/create"}>
+                <Link to={"/matches/create"}>
                     <MdOutlineAddBox className='text-sky-800 text-4xl' />
                 </Link>
             </div>
@@ -46,11 +46,11 @@ const Home = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {books.map((book, index) => (
-                                <tr key={book._id} className='h-8'>
+                            {matches.map((match, index) => (
+                                <tr key={match._id} className='h-8'>
                                     <td className='border border-slate-600 rounded-md text-center'>{index+1}</td>
-                                    <td className='border border-slate-600 rounded-md text-center'>{book.date}</td>
-                                    <td className='border border-slate-600 rounded-md text-center'>{book.user2}</td>
+                                    <td className='border border-slate-600 rounded-md text-center'>{match.date}</td>
+                                    <td className='border border-slate-600 rounded-md text-center'>{match.user2}</td>
                                 </tr>
                             ))}
                         </tbody>

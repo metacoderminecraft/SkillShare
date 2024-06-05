@@ -2,7 +2,7 @@
 
 import mongoose from "mongoose";
 
-const bookSchema = mongoose.Schema(
+const matchSchema = mongoose.Schema(
     {
         user1: {
             type: String,
@@ -22,4 +22,4 @@ const bookSchema = mongoose.Schema(
     }
 );
 
-export const matchModel = mongoose.model("matchModel", bookSchema)
+export const matchModel = mongoose.model("matchModel", matchSchema)

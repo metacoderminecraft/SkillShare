@@ -12,15 +12,15 @@ router.post("/", async (request, response) => {
             return response.status(400).send({ message: "send all fields" })
         }
 
-        const newBook = {
+        const newMatch = {
             user1: request.body.user1,
             user2: request.body.user2,
             date: request.body.date
         }
 
-        const book = await matchModel.create(newBook);
+        const match = await matchModel.create(newMatch);
 
-        response.status(200).send(book);
+        response.status(200).send(match);
     } catch (error) {
         console.log(error);
         response.status(500).send({message: error.message});
@@ -29,11 +29,11 @@ router.post("/", async (request, response) => {
 
 router.get("/", async (request, response) => {
     try {
-        const books = await matchModel.find({});
+        const matches = await matchModel.find({});
 
         return response.status(200).send({
-            count: books.length,
-            data: books
+            count: matches.length,
+            data: matches
         })
     } catch (error) {
         console.log(error);
@@ -45,13 +45,13 @@ router.get("/:id", async (request, response) => {
     try {
         const { id } = request.params;
 
-        const book = await matchModel.findById(id);
+        const match = await matchModel.findById(id);
 
-        if (!book) {
-            return response.status(404).send( {message: "Book Not Found"} );
+        if (!match) {
+            return response.status(404).send( {message: "Match Not Found"} );
         }
 
-        return response.status(200).json(book);
+        return response.status(200).json(match);
     } catch (error) {
         console.log(error);
         response.status(500).send({ message: error.message });
@@ -69,19 +69,19 @@ router.put("/:id", async (request, response) => {
             return response.status(400).send({ message: "send all fields" })
         }
 
-        const newBook = {
+        const newMatch = {
             user1: request.body.user1,
             user2: request.body.user2,
             date: request.body.date
         }
 
-        const book = await matchModel.findByIdAndUpdate(id, newBook);
+        const match = await matchModel.findByIdAndUpdate(id, newMatch);
 
-        if (!book) {
-            return response.status(404).send({ message: "Book not found" });
+        if (!match) {
+            return response.status(404).send({ message: "Match not found" });
         }
 
-        return response.status(200).send( {message: "Book Updated!" });        
+        return response.status(200).send( {message: "Match Updated!" });        
     } catch (error) {
         console.log(error);
         response.status(500).send({message: error.message});
@@ -92,25 +92,25 @@ router.delete("/:id", async (request, response) => {
     try {
         const { id } = request.params;
 
-        const book = await matchModel.findByIdAndDelete(id);
+        const match = await matchModel.findByIdAndDelete(id);
 
-        if (!book) {
-            return response.status(404).send( {message: "Book not found" });
+        if (!match) {
+            return response.status(404).send( {message: "Match not found" });
         }
 
-        return response.status(200).send({message: "Book deleted"});
+        return response.status(200).send({message: "Match deleted"});
     } catch (error) {
         console.log(error);
         response.status(500).send({message: error.message});
     }
 })
 
-//Delete all books (danger)
+//Delete all matches (danger)
 router.delete("/", async (request, response) => {
     try {
         await matchModel.deleteMany();
 
-        return response.status(200).send( {message: `You deleted all books!`} ); 
+        return response.status(200).send( {message: `You deleted all matches!`} ); 
 
     } catch (error) {
         console.log(error);

@@ -1,13 +1,17 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import CreateBook from './pages/CreateBook';
+import CreateMatch from './pages/CreateMatch';
+import Login from "./pages/Login";
+import SignUp from './pages/SignUp';
 
 const App = () => {
   return (
     <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='/books/create' element={<CreateBook />}></Route>
+      <Route path='/' element={<Login />} />
+      <Route path='/signup' element={<SignUp />} />
+      <Route path='/home' element={<Home />} />
+      <Route path='/matches/create' element={<CreateMatch />}></Route>
     </Routes>
   )
 }

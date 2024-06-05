@@ -2,13 +2,15 @@ import React, { useState } from 'react'
 import BackButton from '../components/BackButton'
 import axios from 'axios';
 import ThreeDots from 'react-loading-icons/dist/esm/components/three-dots';
+import { useNavigate } from 'react-router-dom';
 
-const CreateBook = () => {
+const CreateMatch = () => {
     const [loading, setLoading] = useState(false);
     const [contact, setContact] = useState("");
     const [date, setDate] = useState("");
+    const navigate = useNavigate();
     
-    const handleSaveBook = () => {
+    const handleSaveMatch = () => {
         setLoading(true);
         const data = {
             user1: "TODO",
@@ -16,9 +18,10 @@ const CreateBook = () => {
             date: date
         }
         axios
-        .post("http://localhost:1155/books", data)
+        .post("http://localhost:1155/matches", data)
         .then(() => {
             setLoading(false);
+            navigate("/");
         })
         .catch((error) => {
             alert('error, check console');
@@ -29,7 +32,7 @@ const CreateBook = () => {
 
     return (
     <div className='p-4'>
-        <BackButton />
+        <BackButton destination='/home' />
         {
             loading ? (
                 <div className='flex justify-center'>
@@ -43,7 +46,7 @@ const CreateBook = () => {
                     <label className='text-xl mr-4 text-gray-500'>Date</label>
                     <input type='text' value={date} onChange={(e) => setDate(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full' />
                     </div>
-                    <button className='p-2 bg--sky-300 m-8'onClick={handleSaveBook}>Save</button>
+                    <button className='p-2 bg--sky-300 m-8'onClick={handleSaveMatch}>Save</button>
                 </div>
             )
         }
@@ -51,4 +54,4 @@ const CreateBook = () => {
     )
 }
 
-export default CreateBook
+export default CreateMatch

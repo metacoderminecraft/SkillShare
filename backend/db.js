@@ -2,7 +2,8 @@
 //https://github.com/mohammad-taheri1/Book-Store-MERN-Stack
 
 import matchRoutes from "./routes/matchRoutes.js";
-import { MongoDBURL, PORT } from "./config.js";
+import userRoutes from "./routes/userRoutes.js";
+import { PORT } from "./config.js";
 import express from "express";
 import cors from 'cors';
 import mongoose from "mongoose";
@@ -13,10 +14,12 @@ app.use(express.json());
 
 app.use(cors());
 
-app.use("/books", matchRoutes);
+app.use("/matches", matchRoutes);
+
+app.use("/users", userRoutes);
 
 mongoose
-  .connect(MongoDBURL)
+  .connect(process.env.MongoDBURL)
   .then(() => {
     console.log('App connected to database');
     app.listen(PORT, () => {
