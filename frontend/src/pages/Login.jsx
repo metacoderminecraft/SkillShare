@@ -1,23 +1,30 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useUser } from './UserContext'
-import { useState } from 'react'
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useUser } from '../components/UserContext';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const { user, login, logout } = useUser();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
-  const handleLogin = () => {
-    if (username && password) {
-      login({ username: username, password: password });
-      setUsername("");
-      setPassword("");
-    }
-  }
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  useEffect(() => {
+    if (user) {
+      navigate('/home');
+    }
+  }, [])
+  
+  const handleLogin = async () => {
+    if (username && password) {
+      const isLoggedIn = await login({ username: username, password: password });
+      if (!isLoggedIn) {
+        alert("Login failed");
+      } else {
+        navigate('/home');
+      }
+    }
     setUsername("");
     setPassword("");
   }
@@ -32,21 +39,16 @@ const Login = () => {
           <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full' />
         </div>
         <button onClick={handleLogin}>Login</button>
-        {
-          user ? (
-            <div>
-              <p>you are {user.username}</p>
-              <p>you're password is {user.password}</p>
-            </div>
-          ) : (
-            <p>yo who are you</p> 
-          )
-        }
       </div>
-      <Link to={"/signup"} className='my-10'>
-        Sign Up
-      </Link>
-      <button className='my-4' onClick={handleLogout}>Logout</button>
+      {
+        user ? (
+          <div className='my-10' />
+        ) : (
+          <Link to={"/signup"} className='my-10'>
+          Sign Up
+          </Link>
+        )
+      }
     </div>
   )
 }

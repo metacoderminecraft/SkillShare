@@ -108,7 +108,7 @@ router.delete("/:id", async (request, response) => {
 //Delete all matches (danger)
 router.delete("/", async (request, response) => {
     try {
-        await matchModel.deleteMany();
+        await matchModel.deleteMany({});
 
         return response.status(200).send( {message: `You deleted all matches!`} ); 
 
