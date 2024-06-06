@@ -4,20 +4,13 @@ import axios from 'axios';
 import { ThreeDots } from 'react-loading-icons';
 import { MdOutlineAddBox } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
+import useRedirect from '../hooks/RedirectToLogin';
 
 const Home = () => {
     const [loading, setLoading] = useState(false);
     const [matches, setMatches] = useState([]);
-    const { user } = useUser();
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!user) {
-            navigate("/");
-        }
-    }, [])
+    useRedirect();
 
     useEffect(() => {
         setLoading(true);

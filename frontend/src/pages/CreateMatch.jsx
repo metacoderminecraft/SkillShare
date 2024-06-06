@@ -2,21 +2,14 @@ import React, { useState, useEffect } from 'react'
 import BackButton from '../components/BackButton'
 import axios from 'axios';
 import ThreeDots from 'react-loading-icons/dist/esm/components/three-dots';
-import { useNavigate } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
+import useRedirect from '../hooks/RedirectToLogin';
 
 const CreateMatch = () => {
     const [loading, setLoading] = useState(false);
     const [contact, setContact] = useState("");
     const [date, setDate] = useState("");
-    const navigate = useNavigate();
-    const { user } = useUser();
     
-    useEffect(() => {
-        if (!user) {
-            navigate("/");
-        }
-    }, [])
+    useRedirect();
 
     const handleSaveMatch = () => {
         setLoading(true);
