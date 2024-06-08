@@ -3,32 +3,32 @@ import BackButton from '../components/BackButton'
 import axios from 'axios';
 import ThreeDots from 'react-loading-icons/dist/esm/components/three-dots';
 import useRedirect from '../hooks/RedirectToLogin';
+import { useUser } from '../components/UserContext';
 
 const CreateMatch = () => {
     const [loading, setLoading] = useState(false);
     const [contact, setContact] = useState("");
     const [date, setDate] = useState("");
+    const { user } = useUser();
     
     useRedirect();
 
-    const handleSaveMatch = () => {
+    const handleSaveMatch = async () => {
         setLoading(true);
         const data = {
-            user1: "TODO",
+            user1: user,
             user2: contact,
             date: date
         }
-        axios
-        .post("http://localhost:1155/matches", data)
-        .then(() => {
+
+        try {
+            await axios.post("http://localhost:1155/matches", data);
             setLoading(false);
-            navigate("/home");
-        })
-        .catch((error) => {
-            alert('error, check console');
+            navigate("/home")
+        } catch (error) {
             console.log(error);
             setLoading(false);
-        })
+        }
     }
 
     return (

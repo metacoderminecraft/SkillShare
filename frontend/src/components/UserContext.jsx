@@ -7,25 +7,20 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     const login = async (userData) => {
-        return axios
-                .get(`http://localhost:1155/users/${userData.username}`)
-                .then((response) => {
-                    if (userData.password == response.data.password) {
-                        setUser(userData);
-                        return true;
-                    }
-                    
-                    return false;
-                })
-                .catch((error) => {
-                    if (error.response && error.response.status == 404) {
-                        return false;
-                    } else {
-                        console.log(error);
-                    }
-                })
+        try {
+            const response = await axios.get(`http://localhost:1155/users/${userData.username}`);
 
-                return false;
+            if (userData.password == response.data.password) {
+                setUser(userData);
+                return true;
+            }
+        } catch (error) {
+            if (error.response.status != 404) {
+                console.log(error);
+            }
+
+            return false;
+        }
     }
 
     const logout = () => {

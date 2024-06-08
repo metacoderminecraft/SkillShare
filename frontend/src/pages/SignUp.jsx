@@ -18,32 +18,28 @@ const SignUp = () => {
   }, [])
 
   const handleSignUp = async () => {
-    if (username && password) {
-      //there has to be a better way to do this
-      axios
-        .get(`http://localhost:1155/users/${username}`)
-        .then(() => {
-          alert("Username Taken!");
-        })
-        .catch((error) => {
-          if (error.response && error.response.status == 404) {
-            const newUser = {
-              username: username,
-              password: password
-            }
-    
-            axios
-              .post("http://localhost:1155/users", newUser)
-              .then(() => {
-                navigate("/");
-              })
-              .catch((error) => {
-                console.log(error);
-              })
-          } else {
-            console.log(error);
-          }
-        })
+    if (!username || !password) {
+      alert('Please put in a username/password');
+    }
+
+    try {
+      await axios.get(`http://localhost:1155/users/${username}`);
+      //above does not throw error
+      alert("Username Taken!");
+    } catch (error) {
+      if (error.response && error.response.status == 404) {
+        const newUser = {
+          username: username,
+          password: password
+        }
+
+        try {
+          await axios.post("http://localhost:1155/users", newUser)
+          navigate("/");
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
     setUsername("");
     setPassword("");
