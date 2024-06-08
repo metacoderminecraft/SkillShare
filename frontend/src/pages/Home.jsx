@@ -12,16 +12,20 @@ const Home = () => {
 
     useRedirect();
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get("http://localhost:1155/matches");
-            setMatches(response.data.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            try {
+                const response = await axios.get("http://localhost:1155/matches");
+                setMatches(response.data.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+                setLoading(false);
+            }
         }
+
+        fetchData();
     }, [])
 
     return (
