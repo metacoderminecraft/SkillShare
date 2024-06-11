@@ -58,6 +58,23 @@ router.get("/:id", async (request, response) => {
     }
 })
 
+router.get("/byUser/:username", async (request, response) => {
+    try {
+        const { username } = request.params;
+
+        const user1Matches = await matchModel.find({ user1: username });
+        const user2Matches = await matchModel.find({ user2: username });
+
+        return response.status(200).send({
+                isUser1: user1Matches,
+                isUser2: user2Matches
+        })
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({ message: error.message });
+    }
+})
+
 router.put("/:id", async (request, response) => {
     try {
         const { id } = request.params;
