@@ -21,6 +21,11 @@ const CreateMatch = () => {
             return;
         }
 
+        if (contact == user.username) {
+            alert('no');
+            return;
+        }
+
         let newDate;
 
         try {
@@ -31,15 +36,29 @@ const CreateMatch = () => {
         }
 
         try {
-            newDate.setHours(parseInt(time.slice(0,2)));
-            newDate.setMinutes(parseInt(time.slice(3,5)));
+            if (time.length == 4) {
+                newDate.setHours(parseInt(time.slice(0,1)));
+                newDate.setMinutes(parseInt(time.slice(2,4)));
+            } else {
+                newDate.setHours(parseInt(time.slice(0,2)));
+                newDate.setMinutes(parseInt(time.slice(3,5)));
+            }
         } catch (error) {
             alert("Time entered not valid!");
             return;
         }
 
-        console.log(newDate);
-        console.log(newDate.getDate());
+        try {
+            const response = await axios.post(`http://localhost:1155/users/confirmUser`, { username: contact });
+
+            if (!response.data.exists) {
+                alert("No such user!")
+                return;
+            }
+        } catch (error) {
+            console.log(error);
+            return;
+        }
 
         setLoading(true);
         const data = {
@@ -73,9 +92,14 @@ const CreateMatch = () => {
                     <input type='text' value={user.username} readOnly className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
                     <label className='text-2xl mr-4 text-gray-500'>Contact</label>
                     <input type='text' value={contact} onChange={(e) => setContact(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
+                    <button onClick={() => {
+                        const currDate = new Date();
+                        setDate(`${currDate.getMonth() + 1}/${currDate.getDate()}/${currDate.getFullYear()}`);
+                        setTime(`${currDate.getHours()}:${currDate.getMinutes().toString().padStart(2, '0')}`)
+                    }} className='flex text-2xl mt-6 mb-2 bg-red-600 rounded-md p-2 text-white'>Autofill</button>
                     <label className='text-2xl mr-4 text-gray-500'>Date</label>
                     <input type='text' placeholder='mm/dd/yyyy' value={date} onChange={(e) => setDate(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
-                    <label className='text-2xl mr-4 text-gray-500'>Time</label>
+                    <label className='text-2xl mr-4 text-gray-500'>Army Time</label>
                     <input type='text' placeholder='hh:mm' value={time} onChange={(e) => setTime(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
                     </div>
                     <button className='p-2 bg--sky-300 m-8 text-2xl'onClick={handleSaveMatch}>Save</button>

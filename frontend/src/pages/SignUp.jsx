@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -23,24 +23,14 @@ const SignUp = () => {
     }
 
     try {
-      await axios.get(`http://localhost:1155/users/${username}`);
-      //above does not throw error
-      alert("Username Taken!");
+      const response = await axios.post("http://localhost:1155/users/register", { username, password }, { withCredentials: true });
+      setUser(response.data.user);
+      navigate("/home");
     } catch (error) {
-      if (error.response && error.response.status == 404) {
-        const newUser = {
-          username: username,
-          password: password
-        }
-
-        try {
-          await axios.post("http://localhost:1155/users", newUser)
-          navigate("/");
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      alert("Sign Up Failed!");
+      console.log(error);
     }
+
     setUsername("");
     setPassword("");
   }

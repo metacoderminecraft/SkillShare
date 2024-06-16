@@ -8,28 +8,26 @@ export const UserProvider = ({ children }) => {
 
     const login = async (userData) => {
         try {
-            const response = await axios.get(`http://localhost:1155/users/${userData.username}`);
-
-            if (userData.password == response.data.password) {
-                setUser(userData);
-                return true;
-            }
+            const response = await axios.post(`http://localhost:1155/users/login`, { username: userData.username, password: userData.password }, { withCredentials: true });
+            setUser(response.data.user);
+            return true;
         } catch (error) {
-            if (error.response.status != 404) {
-                console.log(error);
-            }
-
+            console.log(error);
             return false;
         }
     }
-
-    const logout = () => {
-        setUser(null);
+  
+    const logout = async () => {
+        try {
+            await axios.post(`http://localhost:1155/users/logout`, {}, { withCredentials: true });
+            setUser(null);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-
     return (
-        <UserContext.Provider value={{ user, login, logout }}>
+        <UserContext.Provider value={{ user, setUser, login, logout }}>
             {children}
         </UserContext.Provider>
     )

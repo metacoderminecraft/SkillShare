@@ -65,6 +65,9 @@ router.get("/byUser/:username", async (request, response) => {
         const user1Matches = await matchModel.find({ user1: username });
         const user2Matches = await matchModel.find({ user2: username });
 
+        console.log(user1Matches);
+        console.log(user2Matches);
+
         return response.status(200).send({
                 isUser1: user1Matches,
                 isUser2: user2Matches

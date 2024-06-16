@@ -7,12 +7,24 @@ import { PORT } from "./config.js";
 import express from "express";
 import cors from 'cors';
 import mongoose from "mongoose";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 
 const app = express();
 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 app.use(express.json());
 
-app.use(cors());
+app.use(session({
+  secret: process.env.SECRET_KEY,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MongoDBURL })
+}))
 
 app.use("/matches", matchRoutes);
 

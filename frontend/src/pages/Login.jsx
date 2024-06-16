@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { user, login, logout } = useUser();
+  const { user, login } = useUser();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const Login = () => {
   
   const handleLogin = async () => {
     if (username && password) {
-      const isLoggedIn = await login({ username: username, password: password });
+      const isLoggedIn = await login({ username, password });
       if (!isLoggedIn) {
         alert("Login failed");
       } else {
