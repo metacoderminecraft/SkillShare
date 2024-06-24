@@ -15,7 +15,7 @@ const useRedirectToLogin = () => {
         axios.get("http://localhost:1155/users/checkAuth", { withCredentials: true })
         .then(response => {
             if (!response.data.authenticated) {
-                navigate("/")
+                navigate("/");
             }
 
             setUser(response.data.user);

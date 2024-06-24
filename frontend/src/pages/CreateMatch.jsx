@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateMatch = () => {
     const [loading, setLoading] = useState(false);
-    const [contact, setContact] = useState("");
+    const [recipient, setRecipient] = useState("");
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const { user } = useUser();
@@ -16,23 +16,14 @@ const CreateMatch = () => {
     
     useRedirect();
 
-    const handleSaveMatch = async () => {
-        if (!contact || ! date || !time) {
-            return;
-        }
-
-        if (contact == user.username) {
-            alert('no');
-            return;
-        }
-
+    const handleDate = () => {
         let newDate;
 
         try {
             newDate = new Date(date);
         } catch (error) {
             alert("Date entered not valid!");
-            return;
+            return false;
         }
 
         try {
@@ -45,34 +36,30 @@ const CreateMatch = () => {
             }
         } catch (error) {
             alert("Time entered not valid!");
-            return;
+            return false;
         }
 
-        try {
-            const response = await axios.post(`http://localhost:1155/users/confirmUser`, { username: contact });
+        return newDate;
+    }
 
-            if (!response.data.exists) {
-                alert("No such user!")
-                return;
-            }
-        } catch (error) {
-            console.log(error);
+    const handleSaveMatch = async () => {
+        const newDate = handleDate();
+        if (!newDate) {
             return;
         }
 
         setLoading(true);
-        const data = {
-            user1: user.username,
-            user2: contact,
-            date: newDate
-        }
 
         try {
-            await axios.post("http://localhost:1155/matches", data);
+            await axios.post("http://localhost:1155/matches/request", { recipient, date: newDate }, { withCredentials: true });
             setLoading(false);
             navigate("/home")
         } catch (error) {
-            console.log(error);
+            if (error.response.status == 404) {
+                alert("No such user!");
+            } else {
+                console.log(error);
+            }
             setLoading(false);
         }
     }
@@ -88,10 +75,10 @@ const CreateMatch = () => {
             ) : (
                 <div className='flex flex-col border 2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto'>
                     <div className="my-4">
-                    <label className='text-2xl mr-4 text-gray-500'>Proposer</label>
+                    <label className='text-2xl mr-4 text-gray-500'>Requester</label>
                     <input type='text' value={user.username} readOnly className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
-                    <label className='text-2xl mr-4 text-gray-500'>Contact</label>
-                    <input type='text' value={contact} onChange={(e) => setContact(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
+                    <label className='text-2xl mr-4 text-gray-500'>Recipient</label>
+                    <input type='text' value={recipient} onChange={(e) => setRecipient(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
                     <button onClick={() => {
                         const currDate = new Date();
                         setDate(`${currDate.getMonth() + 1}/${currDate.getDate()}/${currDate.getFullYear()}`);
