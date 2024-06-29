@@ -100,12 +100,17 @@ router.get("/myMatches", isAuthenticated, async (request, response) => {
             {
                 $match: {
                     $or: [
-                        { requester: userId, status: "rejected" },
-                        { recipient: userId, status: "rejected"}
+                        { requester: mongoose.Types.ObjectId.createFromHexString(userId), status: "rejected" }
                     ]
                 }
             }
         ]);
+
+        await Match.populate(rejected, { path: 'requester' });
+        await Match.populate(rejected, { path: 'recipient' });
+
+        const rejectedMatchIds = rejected.map(match => match._id);
+        await Match.deleteMany({ _id: { $in: rejectedMatchIds } });
 
         return response.status(200).send({ outgoing, incoming, approved, rejected })
     } catch (error) {
@@ -116,7 +121,7 @@ router.get("/myMatches", isAuthenticated, async (request, response) => {
 
 router.get("/", async (request, response) => {
     try {
-        const matches = await Match.find({});
+        const matches = await Match.find({}).populate('recipient').populate('requester');
 
         return response.status(200).send({
             count: matches.length,

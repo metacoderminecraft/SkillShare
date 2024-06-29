@@ -1,7 +1,16 @@
 import express, { request } from "express";
 import { User } from "../dbModels/User.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
+
+const isAuthenticated = (request, response, next) => {
+    if (request.session.userId) {
+        return next();
+    }
+
+    return response.status(401).send({ message: "Unauthorized from authentication" });
+}
 
 router.post("/register", async (request, response) => {
     try {
@@ -9,7 +18,13 @@ router.post("/register", async (request, response) => {
             !request.body.password
         ) {
             return response.status(400).send( {message: "send all fields" });
-        }   
+        }
+        
+        const otherUsers = User.findOne({ username: request.body.username });
+
+        if (otherUsers) {
+            return response.status(409).send({ message: "username taken" });
+        }
 
         const newUser = new User({
             username: request.body.username,
@@ -33,8 +48,6 @@ router.post('/login', async (request, response) => {
         }
 
         request.session.userId = user._id;
-
-        console.log(request.session.userId);
 
         return response.status(200).json({ user });
 
@@ -63,6 +76,23 @@ router.get('/checkAuth', async (request, response) => {
         return response.status(200).json({ authenticated: false });
     }
 });
+
+router.get("/match", isAuthenticated, async (request, response) => {
+    try {
+        const userId = request.session.userId;
+
+        const random = await User.aggregate([
+            //don't recommend themselves
+            { $match: { _id: { $ne: mongoose.Types.ObjectId.createFromHexString(userId)} } },
+            { $sample: { size: 1 } }
+        ]);
+
+        return response.status(200).send({ user: random[0] });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({ message: error.message });
+    }
+})
 
 //remove following after project completion; for testing purposes
 
