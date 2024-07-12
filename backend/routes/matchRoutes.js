@@ -119,6 +119,8 @@ router.get("/myMatches", isAuthenticated, async (request, response) => {
     }
 })
 
+
+//remove the following after project completion
 router.get("/", async (request, response) => {
     try {
         const matches = await Match.find({}).populate('recipient').populate('requester');

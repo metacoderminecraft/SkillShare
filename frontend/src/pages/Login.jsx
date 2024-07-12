@@ -20,14 +20,20 @@ const Login = () => {
   
   const handleLogin = async () => {
     setLoading(true);
-    if (username && password) {
-      const isLoggedIn = await login({ username, password });
-      if (!isLoggedIn) {
-        alert("Login failed");
-      } else {
-        navigate('/home');
-      }
+
+    if (!username || !password) {
+      alert('Please put in a username/password');
+      setLoading(false);
+      return;
     }
+
+    const isLoggedIn = await login({ username, password });
+    if (!isLoggedIn) {
+      alert("Login failed");
+    } else {
+      navigate('/home');
+    }
+
     setUsername("");
     setPassword("");
     setLoading(false);

@@ -1,7 +1,29 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt';
 
-const UserSchema = mongoose.Schema(
+const weightsSchema = mongoose.Schema(
+    {
+        tech: {
+            type: Number,
+            required: true
+        },
+        art: {
+            type: Number,
+            required: true
+        },
+        wellness: {
+            type: Number,
+            required: true
+        },
+        sports: {
+            type: Number,
+            required: true
+        }
+    },
+    { _id: false }
+)
+
+const userSchema = mongoose.Schema(
     {
         username: {
             type: String,
@@ -11,18 +33,28 @@ const UserSchema = mongoose.Schema(
         password: {
             type: String,
             required: true
+        },
+        preferences: {
+            type: weightsSchema,
+            required: true,
+            default: {
+                tech: 0.25,
+                art: 0.25,
+                wellness: 0.25,
+                sports: 0.25
+            }
         }
     }
 )
 
-UserSchema.set('toJSON', {
+userSchema.set('toJSON', {
     transform: function (doc, ret) {
       delete ret.password;
       return ret;
     }
   });
 
-UserSchema.pre("save", function(next) {
+userSchema.pre("save", function(next) {
     if (!this.isModified('password')) {
         next();
     }
@@ -37,8 +69,25 @@ UserSchema.pre("save", function(next) {
         });
 })
 
-UserSchema.methods.comparePassword = function(candidatePassword) {
+userSchema.methods.comparePassword = function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 }
 
-export const User = mongoose.model("User", UserSchema);
+userSchema.methods.selectFocusWeighted = function() {
+    const random = Math.random();
+    let sum = this.preferences.tech;
+    if (random < sum) {
+        return "tech";
+    }
+    sum += this.preferences.art;
+    if (random < sum) {
+        return "art";
+    }
+    sum += this.preferences.wellness;
+    if (random < sum) {
+        return "wellness"
+    }
+    return "sports";
+}
+
+export const User = mongoose.model("User", userSchema);

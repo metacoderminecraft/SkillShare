@@ -12,9 +12,7 @@ const Dashboard = () => {
     const [outgoingRequests, setOutgoingRequests] = useState([]);
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [approvedRequests, setApprovedRequests] = useState([]);
-    const { user, logout } = useUser();
-
-    useRedirect();
+    const { user } = useUser();
 
     async function fetchData() {
         if (!user) {

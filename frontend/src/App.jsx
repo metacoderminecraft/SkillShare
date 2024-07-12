@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import CreateMatch from './pages/CreateMatch';
 import Login from "./pages/Login";
 import SignUp from './pages/SignUp';
+import CreateSkill from './pages/CreateSkill';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
       <Route path='/signup' element={<SignUp />} />
       <Route path='/home' element={<Home />} />
       <Route path='/matches/create' element={<CreateMatch />} />
+      <Route path='/skills/create' element={<CreateSkill />} />
     </Routes>
   )
 }

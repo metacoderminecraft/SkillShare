@@ -1,6 +1,5 @@
 import express, { request } from "express";
 import { User } from "../dbModels/User.js";
-import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -20,7 +19,7 @@ router.post("/register", async (request, response) => {
             return response.status(400).send( {message: "send all fields" });
         }
         
-        const otherUsers = User.findOne({ username: request.body.username });
+        const otherUsers = await User.findOne({ username: request.body.username });
 
         if (otherUsers) {
             return response.status(409).send({ message: "username taken" });
@@ -77,23 +76,6 @@ router.get('/checkAuth', async (request, response) => {
     }
 });
 
-router.get("/match", isAuthenticated, async (request, response) => {
-    try {
-        const userId = request.session.userId;
-
-        const random = await User.aggregate([
-            //don't recommend themselves
-            { $match: { _id: { $ne: mongoose.Types.ObjectId.createFromHexString(userId)} } },
-            { $sample: { size: 1 } }
-        ]);
-
-        return response.status(200).send({ user: random[0] });
-    } catch (error) {
-        console.log(error);
-        response.status(500).send({ message: error.message });
-    }
-})
-
 //remove following after project completion; for testing purposes
 
 router.get("/", async (request, response) => {
@@ -123,6 +105,17 @@ router.delete("/:id", async (request, response) => {
     } catch (error) {
         console.log(error);
         response.status(500).send({ message: error.message });
+    }
+})
+
+router.delete("/", async (request, response) => {
+    try {
+        await User.deleteMany({});
+
+        return response.status(200).send({ message: "Users deleted" });
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
     }
 })
 

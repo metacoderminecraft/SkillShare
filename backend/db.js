@@ -3,6 +3,7 @@
 
 import matchRoutes from "./routes/matchRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import skillRoutes from "./routes/skillRoutes.js";
 import { PORT } from "./config.js";
 import express from "express";
 import cors from 'cors';
@@ -29,6 +30,8 @@ app.use(session({
 app.use("/matches", matchRoutes);
 
 app.use("/users", userRoutes);
+
+app.use("/skills", skillRoutes);
 
 mongoose
   .connect(process.env.MongoDBURL)

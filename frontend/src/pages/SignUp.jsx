@@ -10,6 +10,7 @@ const SignUp = () => {
   const { user, setUser } = useUser();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [reEnterPassword, setReEnterPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -21,8 +22,16 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     setLoading(true);
-    if (!username || !password) {
-      alert('Please put in a username/password');
+    if (!username || !password || !reEnterPassword) {
+      alert('Please enter all fields');
+      setLoading(false);
+      return;
+    }
+
+    if (reEnterPassword != password) {
+      alert("Passwords do not match!");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -40,6 +49,7 @@ const SignUp = () => {
 
     setUsername("");
     setPassword("");
+    setReEnterPassword("");
     setLoading(false);
   }
 
@@ -59,6 +69,8 @@ const SignUp = () => {
               <input type='text' value={username} onChange={(e) => setUsername(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
               <label className='text-2xl mr-4 text-gray-500'>Password</label>
               <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
+              <label className='text-2xl mr-4 text-gray-500'>Re-Enter Password</label>
+              <input type='password' value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
             </div>
             <button onClick={handleSignUp} className='text-2xl my-4'>Sign Up</button>
           </div>
