@@ -11,7 +11,7 @@ const matchSchema = mongoose.Schema(
         },
         recipient: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Skill",
             required: true
         },
         date: {

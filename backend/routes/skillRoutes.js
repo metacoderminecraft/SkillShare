@@ -49,6 +49,24 @@ router.delete("/delete", isAuthenticated, async (request, response) => {
     }
 })
 
+router.get("/search", isAuthenticated, async (request, response) => {
+    try {
+        const user = await User.findById(request.session.userId);
+
+        const randomFocus = user.selectFocusWeighted();
+
+        const randomSkill = Skill.aggregate([
+            { $match : { focus: randomFocus } },
+            { $match : { user: { $ne: request.session.userId } } }
+        ]);
+
+        return response.status(200).send({ skill: randomSkill });
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
 
 //delete after project
 router.get("/", async (request, response) => {
