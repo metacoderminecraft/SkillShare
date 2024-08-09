@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+//authentication middleware
 const isAuthenticated = (request, response, next) => {
     if (request.session.userId) {
         return next();
