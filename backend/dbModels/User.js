@@ -1,7 +1,33 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt';
 
-const UserSchema = mongoose.Schema(
+const weightsSchema = mongoose.Schema(
+    {
+        tech: {
+            type: Number,
+            string: "tech",
+            required: true
+        },
+        art: {
+            type: Number,
+            string: "art",
+            required: true
+        },
+        wellness: {
+            type: Number,
+            string: "wellness",
+            required: true
+        },
+        sports: {
+            type: Number,
+            string: "sports",
+            required: true
+        }
+    },
+    { _id: false }
+)
+
+const userSchema = mongoose.Schema(
     {
         username: {
             type: String,
@@ -11,18 +37,28 @@ const UserSchema = mongoose.Schema(
         password: {
             type: String,
             required: true
+        },
+        preferences: {
+            type: weightsSchema,
+            required: true,
+            default: {
+                tech: 0.25,
+                art: 0.25,
+                wellness: 0.25,
+                sports: 0.25
+            }
         }
     }
 )
 
-UserSchema.set('toJSON', {
+userSchema.set('toJSON', {
     transform: function (doc, ret) {
       delete ret.password;
       return ret;
     }
   });
 
-UserSchema.pre("save", function(next) {
+userSchema.pre("save", function(next) {
     if (!this.isModified('password')) {
         next();
     }
@@ -37,8 +73,59 @@ UserSchema.pre("save", function(next) {
         });
 })
 
-UserSchema.methods.comparePassword = function(candidatePassword) {
+userSchema.methods.comparePassword = function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 }
 
-export const User = mongoose.model("User", UserSchema);
+userSchema.methods.selectFocusWeighted = function() {
+    const random = Math.random();
+    let sum = 0;
+
+    for (let key in this.preferences) {
+        sum += this.preferences[key];
+
+        if (random < this.preferences[key]) {
+            return this.preferences[key].string
+        }
+    }
+
+    return "sports";
+}
+
+userSchema.methods.updateLiked = function(focus) {
+    const factors = {
+        tech: { increase: "tech", decrease: ["art", "wellness", "sports"] },
+        art: { increase: "art", decrease: ["tech", "wellness", "sports"] },
+        wellness: { increase: "wellness", decrease: ["tech", "art", "sports"] },
+        sports: { increase: "sports", decrease: ["tech", "art", "wellness"] }
+    };
+
+    if (factors[focus]) {
+        this.preferences[factors[focus].increase] *= 1.06;
+        factors[focus].decrease.forEach(pref => {
+            this.preferences[pref] /= 1.02;
+        });
+    }
+
+    return this.save();
+}
+
+userSchema.methods.updateDisliked = function(focus) {
+    const factors = {
+        tech: { decrease: "tech", increase: ["art", "wellness", "sports"] },
+        art: { decrease: "art", increase: ["tech", "wellness", "sports"] },
+        wellness: { decrease: "wellness", increase: ["tech", "art", "sports"] },
+        sports: { decrease: "sports", increase: ["tech", "art", "wellness"] }
+    };
+
+    if (factors[focus]) {
+        this.preferences[factors[focus].decrease] /= 1.06;
+        factors[focus].decrease.forEach(pref => {
+            this.preferences[pref] *= 1.02;
+        });
+    }
+
+    return this.save();
+}
+
+export const User = mongoose.model("User", userSchema);

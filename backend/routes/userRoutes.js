@@ -3,13 +3,27 @@ import { User } from "../dbModels/User.js";
 
 const router = express.Router();
 
+const isAuthenticated = (request, response, next) => {
+    if (request.session.userId) {
+        return next();
+    }
+
+    return response.status(401).send({ message: "Unauthorized from authentication" });
+}
+
 router.post("/register", async (request, response) => {
     try {
         if (!request.body.username ||
             !request.body.password
         ) {
             return response.status(400).send( {message: "send all fields" });
-        }   
+        }
+        
+        const otherUsers = await User.findOne({ username: request.body.username });
+
+        if (otherUsers) {
+            return response.status(409).send({ message: "username taken" });
+        }
 
         const newUser = new User({
             username: request.body.username,
@@ -33,8 +47,6 @@ router.post('/login', async (request, response) => {
         }
 
         request.session.userId = user._id;
-
-        console.log(request.session.userId);
 
         return response.status(200).json({ user });
 
@@ -93,6 +105,17 @@ router.delete("/:id", async (request, response) => {
     } catch (error) {
         console.log(error);
         response.status(500).send({ message: error.message });
+    }
+})
+
+router.delete("/", async (request, response) => {
+    try {
+        await User.deleteMany({});
+
+        return response.status(200).send({ message: "Users deleted" });
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
     }
 })
 
