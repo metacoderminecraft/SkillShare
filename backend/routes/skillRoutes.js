@@ -67,6 +67,34 @@ router.get("/search", isAuthenticated, async (request, response) => {
     }
 })
 
+router.post("/dislike", isAuthenticated, async (request, response) => {
+    try {
+        const skill = await Skill.findById(request.body.skill);
+        const user = await User.findById(request.session.userId);
+
+        user = user.updateDisliked(skill.focus);
+
+        return response.status(200).send({ user });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({ message: error.message });
+    }
+})
+
+router.post("/like", isAuthenticated, async (request, response) => {
+    try {
+        const skill = await Skill.findById(request.body.skill);
+        const user = await User.findById(request.session.userId);
+
+        user = user.updateLiked(skill.focus);
+
+        return response.status(200).send({ user });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({ message: error.message });
+    }
+})
+
 
 //delete after project
 router.get("/", async (request, response) => {

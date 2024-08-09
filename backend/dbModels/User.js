@@ -5,18 +5,22 @@ const weightsSchema = mongoose.Schema(
     {
         tech: {
             type: Number,
+            string: "tech",
             required: true
         },
         art: {
             type: Number,
+            string: "art",
             required: true
         },
         wellness: {
             type: Number,
+            string: "wellness",
             required: true
         },
         sports: {
             type: Number,
+            string: "sports",
             required: true
         }
     },
@@ -75,19 +79,53 @@ userSchema.methods.comparePassword = function(candidatePassword) {
 
 userSchema.methods.selectFocusWeighted = function() {
     const random = Math.random();
-    let sum = this.preferences.tech;
-    if (random < sum) {
-        return "tech";
+    let sum = 0;
+
+    for (let key in this.preferences) {
+        sum += this.preferences[key];
+
+        if (random < this.preferences[key]) {
+            return this.preferences[key].string
+        }
     }
-    sum += this.preferences.art;
-    if (random < sum) {
-        return "art";
-    }
-    sum += this.preferences.wellness;
-    if (random < sum) {
-        return "wellness"
-    }
+
     return "sports";
+}
+
+userSchema.methods.updateLiked = function(focus) {
+    const factors = {
+        tech: { increase: "tech", decrease: ["art", "wellness", "sports"] },
+        art: { increase: "art", decrease: ["tech", "wellness", "sports"] },
+        wellness: { increase: "wellness", decrease: ["tech", "art", "sports"] },
+        sports: { increase: "sports", decrease: ["tech", "art", "wellness"] }
+    };
+
+    if (factors[focus]) {
+        this.preferences[factors[focus].increase] *= 1.06;
+        factors[focus].decrease.forEach(pref => {
+            this.preferences[pref] /= 1.02;
+        });
+    }
+
+    return this.save();
+}
+
+userSchema.methods.updateDisliked = function(focus) {
+    const factors = {
+        tech: { decrease: "tech", increase: ["art", "wellness", "sports"] },
+        art: { decrease: "art", increase: ["tech", "wellness", "sports"] },
+        wellness: { decrease: "wellness", increase: ["tech", "art", "sports"] },
+        sports: { decrease: "sports", increase: ["tech", "art", "wellness"] }
+    };
+
+    if (factors[focus]) {
+        this.preferences[factors[focus].decrease] /= 1.06;
+        factors[focus].decrease.forEach(pref => {
+            this.preferences[pref] *= 1.02;
+        });
+    }
+
+    return this.save();
 }
 
 export const User = mongoose.model("User", userSchema);

@@ -36,6 +36,9 @@ router.post("/request", isAuthenticated, async (request, response) => {
 
         const match = await Match.create(newMatch);
 
+        //update preferences
+        requester.
+
         response.status(200).send(match);
     } catch (error) {
         console.log(error);
@@ -84,7 +87,7 @@ router.get("/myMatches", isAuthenticated, async (request, response) => {
         const userId = request.session.userId;
 
         const outgoing = await Match.find({ requester: userId, status: "pending" }).populate('recipient');
-        const incoming = await Match.find({ "recipient.user": userId, status: "pending" }).populate('requester');
+        const incoming = await Match.find({ "recipient.user": userId, status: "pending" }).populate('requester').populate('recipient');
         const approved = await Match.aggregate([
             {
                 $match:  {
