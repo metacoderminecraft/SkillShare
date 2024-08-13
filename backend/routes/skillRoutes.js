@@ -53,12 +53,22 @@ router.get("/search", isAuthenticated, async (request, response) => {
     try {
         const user = await User.findById(request.session.userId);
 
-        const randomFocus = user.selectFocusWeighted();
+        let randomSkill = [];
 
-        const randomSkill = Skill.aggregate([
-            { $match : { focus: randomFocus } },
-            { $match : { user: { $ne: request.session.userId } } }
-        ]);
+        while (randomSkill.length == 0) {
+            const randomFocus = user.selectFocusWeighted();
+            console.log(randomFocus);
+
+            randomSkill = await Skill.aggregate([
+                { $match : { focus: randomFocus } },
+                { $match : { user: { $ne: request.session.userId } } },
+                { $limit: 1 }
+            ]);
+        }
+
+        randomSkill = randomSkill[0];
+
+        randomSkill = await Skill.populate(randomSkill, { path: "user" });
 
         return response.status(200).send({ skill: randomSkill });
     } catch (error) {
@@ -105,6 +115,23 @@ router.get("/", async (request, response) => {
             count: skills.length,
             data: skills
         });
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
+router.delete("/:id", async (request, response) => {
+    try {
+        const { id } = request.params;
+
+        const skill = await Skill.findByIdAndDelete(id);
+
+        if (!skill) {
+            return response.status(404);
+        }
+
+        return response.status(201);
     } catch (error) {
         console.log(error);
         return response.status(500).send({ message: error.message });

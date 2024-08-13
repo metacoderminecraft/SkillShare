@@ -5,22 +5,18 @@ const weightsSchema = mongoose.Schema(
     {
         tech: {
             type: Number,
-            string: "tech",
             required: true
         },
         art: {
             type: Number,
-            string: "art",
             required: true
         },
         wellness: {
             type: Number,
-            string: "wellness",
             required: true
         },
         sports: {
             type: Number,
-            string: "sports",
             required: true
         }
     },
@@ -78,14 +74,15 @@ userSchema.methods.comparePassword = function(candidatePassword) {
 }
 
 userSchema.methods.selectFocusWeighted = function() {
+    const preferences = this.preferences.toObject();
     const random = Math.random();
     let sum = 0;
 
-    for (let key in this.preferences) {
-        sum += this.preferences[key];
+    for (let key in preferences) {
+        sum += preferences[key];
 
-        if (random < this.preferences[key]) {
-            return this.preferences[key].string
+        if (random < sum) {
+            return key;
         }
     }
 
