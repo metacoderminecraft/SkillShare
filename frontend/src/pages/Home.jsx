@@ -1,64 +1,45 @@
-import React from 'react'
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { ThreeDots } from 'react-loading-icons';
-import { MdOutlineAddBox } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react'
+import Dashboard from './Dashboard'
+import MatchFinding from './MatchFinding';
+import { useState } from 'react';
+import { useUser } from '../components/UserContext';
 import useRedirect from '../hooks/RedirectToLogin';
+import { MdAdd } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const [loading, setLoading] = useState(false);
-    const [matches, setMatches] = useState([]);
+    const [showState, setShowState] = useState("dashboard");
+    const { user, logout } = useUser();
 
     useRedirect();
 
-    useEffect(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get("http://localhost:1155/matches");
-            setMatches(response.data.data);
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    }, [])
-
     return (
-        <div className='p-4'>
-            <div className='flex justify-between items-center'>
-                <h1 className='text-2xl my-8'>Matches</h1>
-                <Link to={"/matches/create"}>
-                    <MdOutlineAddBox className='text-sky-800 text-4xl' />
+    <div>
+            <div className='flex justify-center items-center gap-x-4 mt-4'>
+                <button className='bg-sky-400 hover:bg-sky-600 px-4 py-1 rounded-lg' onClick={() => setShowState("dashboard")}>Dashboard</button>
+                <button className='bg-sky-400 hover:bg-sky-600 px-4 py-1 rounded-lg' onClick={() => setShowState("matchfinding")}>Matchfinding</button>
+            </div>
+            <div className='flex flex-row items-center'>
+                <h1 className='text-4xl ml-4'>{user ? `${user.username}` : ""}</h1>
+                <div className='flex-grow' />
+                <Link to={"../matches/create"} className='mr-4'>
+                    <MdAdd className='text-4xl text-blue-800' />
+                </Link>
+                <Link to={"../skills/create"} className='mr-4'>
+                    <MdAdd className='text-4xl text-red-600' />
                 </Link>
             </div>
-            {
-                loading ? (
-                    <div className='flex justify-center'>
-                    <ThreeDots fill="#000000" />
-                    </div>
-                ) : (
-                    <table className='w-full border-separate border-spacing-2'>
-                        <thead>
-                            <tr>
-                                <th className='border border-slate-600 rounded-md'>#</th>
-                                <th className='border border-slate-600 rounded-md'>Appointment Time</th>
-                                <th className='border border-slate-600 rounded-md'>Contact</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {matches.map((match, index) => (
-                                <tr key={match._id} className='h-8'>
-                                    <td className='border border-slate-600 rounded-md text-center'>{index+1}</td>
-                                    <td className='border border-slate-600 rounded-md text-center'>{match.date}</td>
-                                    <td className='border border-slate-600 rounded-md text-center'>{match.user2}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )
-            }
+        {
+            showState == "matchfinding" ? (
+                <MatchFinding />
+            ) : (
+                <Dashboard />
+            )
+        }
+        <div className='flex justify-center my-12'>
+        <button onClick={logout} className='border-2 border-red-900 bg-red-600 rounded-md p-3 text-white'>Logout</button>
         </div>
+    </div>
     )
 }
 
