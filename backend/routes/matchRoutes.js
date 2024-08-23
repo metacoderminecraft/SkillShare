@@ -17,28 +17,26 @@ const isAuthenticated = (request, response, next) => {
 
 router.post("/request", isAuthenticated, async (request, response) => {
     try {
-        const requester = await User.findById(request.session.userId);
+        const requester = await Skill.findById(request.body.requesterId);
 
-        const recipient = await Skill.findById(request.body.skillId);
+        const recipient = await Skill.findById(request.body.recipientId);
 
-        if (!recipient) {
+        if (!recipient || !requester) {
             return response.status(404).send({ message: "No such skill" });
         }
 
-        if (requester._id == recipient.user) {
+        if (requester.user == recipient.user) {
             return response.status(400).send({ message: "self-request" });
         }
 
         const newMatch = {
             requester: requester._id,
             recipient: recipient._id,
-            date: request.body.date
         }
 
         const match = await Match.create(newMatch);
 
         //update preferences
-        requester.
 
         response.status(200).send(match);
     } catch (error) {
@@ -49,10 +47,11 @@ router.post("/request", isAuthenticated, async (request, response) => {
 
 router.post("/approve", isAuthenticated, async (request, response) => {
     try {
-        const match = await Match.findById(request.body.matchId);
+        const match = await Match.findById(request.body.matchId).populate('recipient');
+        console.log(match);
 
         if (match.recipient.user != request.session.userId) {
-            return response.status(401).send({ message: "Unauthorized to approve/reject" });
+            return response.status(401).send({ message: "Unauthorized to approve" });
         }
 
         match.status = "approved";
@@ -67,10 +66,10 @@ router.post("/approve", isAuthenticated, async (request, response) => {
 
 router.post("/reject", isAuthenticated, async (request, response) => {
     try {
-        const match = await Match.findById(request.body.matchId);
+        const match = await Match.findById(request.body.matchId).populate('recipient');
 
         if (match.recipient.user != request.session.userId) {
-            return response.status(401).send({ message: "Unauthroized to approve/reject" });
+            return response.status(401).send({ message: "Unauthroized to reject" });
         }
 
         match.status = "rejected";
@@ -83,45 +82,150 @@ router.post("/reject", isAuthenticated, async (request, response) => {
     }
 })
 
-router.get("/myMatches", isAuthenticated, async (request, response) => {
+router.get("/outgoing", isAuthenticated, async (request, response) => {
     try {
+
+        //to fix
         const userId = request.session.userId;
 
-        const outgoing = await Match.find({ requester: userId, status: "pending" }).populate('recipient');
-        const incoming = await Match.find({ "recipient.user": userId, status: "pending" }).populate('requester').populate('recipient');
-        const approved = await Match.aggregate([
-            {
-                $match:  {
-                    $or: [
-                        { "recipient.user": mongoose.Types.ObjectId.createFromHexString(userId), status: "approved" },
-                        { requester: mongoose.Types.ObjectId.createFromHexString(userId), status: "approved" }
-                    ]
+        const outgoing = await Match.find({ 'requester.user': userId, status: "pending" })
+            .populate({
+                path: 'requester',
+                populate: {
+                    path: ' user'
                 }
-            }
-          ]);
-        await Match.populate(approved, { path: 'requester' });
-        await Match.populate(approved, { path: 'recipient' });
-
-        const rejected = await Match.aggregate([
-            {
-                $match: {
-                    $or: [
-                        { requester: mongoose.Types.ObjectId.createFromHexString(userId), status: "rejected" }
-                    ]
+            })
+            .populate({
+                path: 'recipient',
+                populate: {
+                    path: 'user'
                 }
-            }
-        ]);
+            });
 
-        await Match.populate(rejected, { path: 'requester' });
-        await Match.populate(rejected, { path: 'recipient' });
-
-        const rejectedMatchIds = rejected.map(match => match._id);
-        await Match.deleteMany({ _id: { $in: rejectedMatchIds } });
-
-        return response.status(200).send({ outgoing, incoming, approved, rejected })
+        return response.status(200).send({ data: outgoing });
+        
     } catch (error) {
         console.log(error);
         return response.status(500).send({ message: error.message });
+    }
+})
+
+router.get("/incoming", isAuthenticated, async (request, response) => {
+    try {
+        const userId = request.session.userId;
+
+        // Step 1: Fetch and populate the matches
+        const matches = await Match.find({ status: "pending" })
+            .populate({
+                path: 'recipient',
+                populate: {
+                    path: 'user'
+                }
+            })
+            .populate({
+                path: 'requester',
+                populate: {
+                    path: 'user'
+                }
+            });
+
+        // Step 2: Filter the results
+        const incoming = matches.filter(match => {
+            return match.recipient.user._id.equals(userId) && !match.requester.user._id.equals(userId);
+        });
+
+        return response.status(200).send({ incoming });
+        
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
+router.get("/approved", isAuthenticated, async (request, response) => {
+    try {
+        const userId = request.session.userId;
+
+        const matches = await Match.find({ status: 'approved' })
+        .populate({
+            path: 'recipient',
+            populate: {
+                path: 'user'
+            }
+        })
+        .populate({
+            path: 'requester',
+            populate: {
+                path: 'user'
+            }
+        });
+
+        const approved = matches.filter((match) => {
+            return match.recipient.user._id.equals(userId) || match.requester.user._id.equals(userId)
+        })
+
+        return response.status(200).send({ approved });
+        
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
+router.get("/rejected", isAuthenticated, async (request, response) => {
+    try {
+        const userId = request.session.userId;
+
+        const matches = await Match.find({ status: 'rejected' })
+        .populate({
+            path: 'recipient',
+            populate: {
+                path: 'user'
+            }
+        })
+        .populate({
+            path: 'requester',
+            populate: {
+                path: 'user'
+            }
+        });
+
+        const rejected = matches.filter((match) => {
+            return match.recipient.user._id.equals(userId) || match.requester.user._id.equals(userId)
+        })
+
+        return response.status(200).send({ rejected });       
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
+router.get("/:id", async (request, response) => {
+    try {
+        const { id } = request.params;
+
+        const match = await Match.findById(id)
+            .populate({
+                path: 'requester',
+                populate: {
+                    path: ' user'
+                }
+            })
+            .populate({
+                path: 'recipient',
+                populate: {
+                    path: 'user'
+                }
+            });
+
+        if (!match) {
+            return response.status(404);
+        }
+
+        return response.status(200).send({ match });
+    } catch (error) {
+        return response.status(500).send({ message: error.message })
     }
 })
 
@@ -129,7 +233,17 @@ router.get("/myMatches", isAuthenticated, async (request, response) => {
 //remove the following after project completion
 router.get("/", async (request, response) => {
     try {
-        const matches = await Match.find({}).populate('recipient').populate('requester');
+        const matches = await Match.find({}).populate({
+            path: 'recipient',
+            populate: {
+                path: 'user'
+            }
+        }).populate({
+            path: 'requester',
+            populate: {
+                path: 'user'
+            }
+        });
 
         return response.status(200).send({
             count: matches.length,
@@ -138,6 +252,23 @@ router.get("/", async (request, response) => {
     } catch (error) {
         console.log(error);
         return response.status(500).send({message: error.message});
+    }
+})
+
+router.delete("/:id", async (request, response) => {
+    try {
+        const { id } = request.params;
+
+        const match = await Match.findByIdAndDelete(id);
+
+        if (!match) {
+            return response.status(404);
+        }
+
+        return response.status(200);
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
     }
 })
 

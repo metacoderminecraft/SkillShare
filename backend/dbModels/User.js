@@ -117,7 +117,7 @@ userSchema.methods.updateDisliked = function(focus) {
 
     if (factors[focus]) {
         this.preferences[factors[focus].decrease] /= 1.06;
-        factors[focus].decrease.forEach(pref => {
+        factors[focus].increase.forEach(pref => {
             this.preferences[pref] *= 1.02;
         });
     }

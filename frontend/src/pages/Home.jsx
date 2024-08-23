@@ -18,15 +18,12 @@ const Home = () => {
             <div className='flex justify-center items-center gap-x-4 mt-4'>
                 <button className='bg-sky-400 hover:bg-sky-600 px-4 py-1 rounded-lg' onClick={() => setShowState("dashboard")}>Dashboard</button>
                 <button className='bg-sky-400 hover:bg-sky-600 px-4 py-1 rounded-lg' onClick={() => setShowState("matchfinding")}>Matchfinding</button>
-            </div>
+            </div>  
             <div className='flex flex-row items-center'>
                 <h1 className='text-4xl ml-4'>{user ? `${user.username}` : ""}</h1>
                 <div className='flex-grow' />
-                <Link to={"../matches/create"} className='mr-4'>
-                    <MdAdd className='text-4xl text-blue-800' />
-                </Link>
                 <Link to={"../skills/create"} className='mr-4'>
-                    <MdAdd className='text-4xl text-red-600' />
+                    <MdAdd className='text-4xl text-blue-600' />
                 </Link>
             </div>
         {
