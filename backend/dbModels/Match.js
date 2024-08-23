@@ -6,16 +6,12 @@ const matchSchema = mongoose.Schema(
     {
         requester: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Skill",
             required: true
         },
         recipient: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Skill",
-            required: true
-        },
-        date: {
-            type: Date,
             required: true
         },
         status : {

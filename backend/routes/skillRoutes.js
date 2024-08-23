@@ -1,6 +1,7 @@
 import { User } from "../dbModels/User.js";
 import { Skill } from "../dbModels/Skill.js";
 import express from "express";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -49,6 +50,19 @@ router.delete("/delete", isAuthenticated, async (request, response) => {
     }
 })
 
+router.get("/mySkills", isAuthenticated, async (request, response) => {
+    try {
+        const userId = request.session.userId;
+
+        const skills = await Skill.find({ user: userId });
+
+        return response.status(200).send({ skills })
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send(error.message);
+    }
+})
+
 router.get("/search", isAuthenticated, async (request, response) => {
     try {
         const user = await User.findById(request.session.userId);
@@ -57,15 +71,12 @@ router.get("/search", isAuthenticated, async (request, response) => {
 
         while (randomSkill.length == 0) {
             const randomFocus = user.selectFocusWeighted();
-            console.log(randomFocus);
 
             randomSkill = await Skill.aggregate([
-                { $match : { focus: randomFocus } },
-                { $match : { user: { $ne: request.session.userId } } },
-                { $limit: 1 }
-            ]);
+                { $match: { user: { $ne: mongoose.Types.ObjectId.createFromHexString(request.session.userId) }, focus: randomFocus } },
+                { $sample: { size: 1 } }
+            ]);            
         }
-
         randomSkill = randomSkill[0];
 
         randomSkill = await Skill.populate(randomSkill, { path: "user" });
@@ -132,6 +143,17 @@ router.delete("/:id", async (request, response) => {
         }
 
         return response.status(201);
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message });
+    }
+})
+
+router.delete("/", async (request, response) => {
+    try {
+        await Skill.deleteMany({});
+
+        return response.status(200);
     } catch (error) {
         console.log(error);
         return response.status(500).send({ message: error.message });

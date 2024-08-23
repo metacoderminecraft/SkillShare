@@ -4,28 +4,40 @@ import { useUser } from '../components/UserContext';
 import ThreeDots from 'react-loading-icons/dist/esm/components/three-dots';
 import useRedirect from '../hooks/RedirectToLogin';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Dropdown from '../components/Dropdown';
 
 const CreateSkill = () => {
     const [loading, setLoading] = useState(false);
-    const [title, setTitle] = useState("");
-    const [focus, setFocus] = useState("");
-    const [description, setDescription] = useState("");
+    const [skillForm, setSkillForm] = useState({
+        title: "",
+        focus: "",
+        description: "",
+    })
     const { user } = useUser();
+    const navigate = useNavigate();
 
     useRedirect();
 
     const handleSaveSkill = async () => {
-        if (!title || !focus || !description) {
+        if (!skillForm.title || !skillForm.focus || !skillForm.description) {
             alert("Enter all fields");
             return;
         }
 
         setLoading(true);
         try {
-            await axios.post("http://localhost:1155/skills/create", { title, description, focus }, { withCredentials: true });
-            setTitle("");
-            setFocus("");
-            setDescription("");
+            await axios.post("http://localhost:1155/skills/create", {
+                 title: skillForm.title, 
+                 description: skillForm.description, 
+                 focus: skillForm.focus 
+                }, { withCredentials: true });
+            setSkillForm({
+                title: "",
+                description: "",
+                focus: ""
+            })
+            navigate("/");
         } catch (error) {
             console.log(error);
         }
@@ -33,7 +45,7 @@ const CreateSkill = () => {
     }
 
     const renderForm = () => {
-        if (focus == "") {
+        if (skillForm.focus == "") {
             return (
                 <>
                     <option value=""></option>
@@ -55,6 +67,15 @@ const CreateSkill = () => {
         )
     }
 
+    const handleChange = (e) => {
+        const entry = e.target.name;
+
+        setSkillForm({
+            ...skillForm,
+            [entry]: e.target.value
+        })
+    }
+
   return (
     <div className='p-4'>
         <BackButton />
@@ -67,13 +88,11 @@ const CreateSkill = () => {
                 <div className='flex flex-col border 2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto'>
                     <div className="my-4 flex flex-col">
                         <label className='text-2xl mr-4 text-gray-500'>Title</label>
-                        <input type='text' maxLength="25" value={title} onChange={(e) => setTitle(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl mb-4' />
+                        <input name='title' type='text' maxLength="25" value={skillForm.title} onChange={handleChange} className='border-2 border-gray-500 px-4 py-2 w-full text-xl mb-4' />
                         <label className='text-2xl mr-4 text-gray-500'>Focus</label>
-                        <select value={focus} onChange={(e) => setFocus(e.target.value)} className='text-2xl mr-4 text-gray-500 border-2 border-slate-600 rounded-md mb-4 w-36'>
-                            {renderForm()}
-                        </select>
+                        <Dropdown name='focus' renderOptions={renderForm} onChange={(value) => setSkillForm({...skillForm, focus: value})} value={skillForm.focus} className='text-2xl mr-4 text-gray-500 border-2 border-slate-600 rounded-md mb-4 w-36' />
                         <label className='text-2xl mr-4 text-gray-500'>Description</label>
-                        <textarea type='text' maxLength="500" rows="6" value={description} onChange={(e) => setDescription(e.target.value)} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
+                        <textarea name='description' type='text' maxLength="500" rows="6" value={skillForm.description} onChange={handleChange} className='border-2 border-gray-500 px-4 py-2 w-full text-xl' />
                     </div>
                     <button className='p-2 bg--sky-300 m-8 text-2xl'onClick={handleSaveSkill}>Save</button>
                 </div>
