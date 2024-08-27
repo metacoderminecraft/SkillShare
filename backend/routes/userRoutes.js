@@ -76,6 +76,22 @@ router.get('/checkAuth', async (request, response) => {
     }
 });
 
+router.get("/:username", async (request, response) => {
+    try {
+        const { username } = request.params;
+        const user = await User.findOne({ username });
+
+        if (!user) {
+            return response.status(404).send({ message: "No such user "});
+        }
+
+        return response.status(200).send({});
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message});
+    }
+})
+
 //remove following after project completion; for testing purposes
 
 router.get("/", async (request, response) => {
