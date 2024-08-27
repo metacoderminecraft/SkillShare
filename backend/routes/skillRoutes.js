@@ -63,6 +63,24 @@ router.get("/mySkills", isAuthenticated, async (request, response) => {
     }
 })
 
+router.get("/:username", async (request, response) => {
+    try {
+        const { username } = request.params;
+        const user = await User.findOne({ username});
+
+        if (!user) {
+            return response.status(404).send({ message: "no such user" });
+        }
+
+        const skills = await Skill.find({ user: user._id });
+
+        return response.status(200).send({ skills });
+    } catch (error) {
+        console.log(error);
+        return response.status(500).send({ message: error.message })
+    }
+})
+
 router.get("/search", isAuthenticated, async (request, response) => {
     try {
         const user = await User.findById(request.session.userId);
