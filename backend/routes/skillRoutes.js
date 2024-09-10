@@ -63,13 +63,14 @@ router.get("/mySkills", isAuthenticated, async (request, response) => {
     }
 })
 
-router.get("/:username", async (request, response) => {
+router.get("/byUsername/:username", async (request, response) => {
     try {
+        console.log("test");
         const { username } = request.params;
-        const user = await User.findOne({ username});
+        const user = await User.findOne({ username });
 
         if (!user) {
-            return response.status(404).send({ message: "no such user" });
+            return response.status(404).send({ message: "goo goo gaa gaa" });
         }
 
         const skills = await Skill.find({ user: user._id });
