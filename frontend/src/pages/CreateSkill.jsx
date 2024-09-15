@@ -37,7 +37,7 @@ const CreateSkill = () => {
                 description: "",
                 focus: ""
             })
-            navigate("/");
+            navigate("/home");
         } catch (error) {
             console.log(error);
         }
