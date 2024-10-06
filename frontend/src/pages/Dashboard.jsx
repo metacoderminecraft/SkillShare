@@ -7,9 +7,9 @@ import { useUser } from '../components/UserContext';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
-  const [outgoingRequests, setOutgoingRequests] = useState([]);
-  const [incomingRequests, setIncomingRequests] = useState([]);
-  const [approvedRequests, setApprovedRequests] = useState([]);
+  const [outgoing, setOutgoing] = useState([]);
+  const [incoming, setIncoming] = useState([]);
+  const [approved, setApproved] = useState([]);
   const { user } = useUser();
 
   async function fetchData() {
@@ -19,35 +19,28 @@ const Dashboard = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:1155/matches/myMatches', {
-        withCredentials: true,
-      });
-      setOutgoingRequests(
-        response.data.outgoing.map((match) => ({
-          ...match,
-          dateObj: new Date(match.date),
-        }))
-      );
-      setIncomingRequests(
-        response.data.incoming.map((match) => ({
-          ...match,
-          dateObj: new Date(match.date),
-        }))
-      );
-      setApprovedRequests(
-        response.data.approved.map((match) => ({
-          ...match,
-          dateObj: new Date(match.date),
-        }))
-      );
-      response.data.rejected.forEach((match) => {
-        alert(`${match.recipient.username} rejected your match request`);
-      });
+      const fetchIncoming = async () => {
+        setLoading(true)
+
+        const responseIn = await axios.get("http://localhost:1155/matches/incoming", { withCredentials: true });
+        setIncoming(responseIn.data.incoming);
+        
+        const responseOut = await axios.get("http://localhost:1155/matches/outgoing", { withCredentials: true });
+        setOutgoing(responseOut.data.outgoing);
+
+        const responseApp = await axios.get("http://localhost:1155/matches/approved", { withCredentials: true });
+        setApproved(responseApp.data.approved);
+
+        const responseReject = await axios.get("http://localhost:1155/matches/rejected", { withCredentials: true });
+        responseReject.data.rejected.forEach((match) => {
+          alert(`${match.recipient.username} rejected your request`);
+        })
+      }
     } catch (error) {
       console.log(error);
     }
     setLoading(false);
-  }
+    }
 
   useEffect(() => {
     fetchData();
@@ -108,8 +101,8 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {outgoingRequests.length > 0 ? (
-                      outgoingRequests.map((match, index) => (
+                    {outgoing.length > 0 ? (
+                      outgoing.map((match, index) => (
                         <tr key={match._id} className='border-b'>
                           <td className='px-4 py-2'>{index + 1}</td>
                           <td className='px-4 py-2'>
@@ -149,8 +142,8 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {incomingRequests.length > 0 ? (
-                      incomingRequests.map((match, index) => (
+                    {incoming.length > 0 ? (
+                      incoming.map((match, index) => (
                         <tr key={match._id} className='border-b'>
                           <td className='px-4 py-2'>{index + 1}</td>
                           <td className='px-4 py-2'>
@@ -206,8 +199,8 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {approvedRequests.length > 0 ? (
-                    approvedRequests.map((match, index) => (
+                  {approved.length > 0 ? (
+                    approved.map((match, index) => (
                       <tr key={match._id} className='border-b'>
                         <td className='px-4 py-2'>{index + 1}</td>
                         <td className='px-4 py-2'>
