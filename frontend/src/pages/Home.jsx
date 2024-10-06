@@ -46,13 +46,7 @@ const Home = () => {
             </button>
 
             {/* Create Buttons */}
-            <Link
-              to='../matches/create'
-              className='text-primary hover:text-secondary transition duration-200'
-              aria-label='Create Match'
-            >
-              <MdAdd size={28} />
-            </Link>
+        
             <Link
               to='../skills/create'
               className='text-primary hover:text-secondary transition duration-200'
