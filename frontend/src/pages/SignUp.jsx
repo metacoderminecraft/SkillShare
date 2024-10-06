@@ -4,6 +4,7 @@ import { useUser } from '../components/UserContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ThreeDots } from 'react-loading-icons';
+import { Link } from 'react-router-dom';
 
 const SignUp = () => {
   const { user, setUser } = useUser();
