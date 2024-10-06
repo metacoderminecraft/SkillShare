@@ -85,8 +85,8 @@ const Dashboard = () => {
                         <table className='w-full'>
                         <thead>
                             <tr>
-                                <th className='text-3xl'>Outgoing</th>
-                                <th className='text-3xl'>Incoming</th>
+                                <th className='text-3xl text-blue-600'>Outgoing</th>
+                                <th className='text-3xl text-blue-600'>Incoming</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,17 +95,17 @@ const Dashboard = () => {
                                 <table className='w-full border-separate border-spacing-2'>
                             <thead>
                                 <tr>
-                                    <th className='border border-slate-600 rounded-md'>#</th>
-                                    <th className='border border-slate-600 rounded-md'>Appointment Time</th>
-                                    <th className='border border-slate-600 rounded-md'>Contact</th>
+                                    <th className='border border-gray-400 rounded-md'>#</th>
+                                    <th className='border border-gray-400 rounded-md'>Appointment Time</th>
+                                    <th className='border border-gray-400 rounded-md'>Contact</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {outgoingRequests.map((match, index) => (
                                     <tr key={match._id} className='h-8'>
-                                        <td className='border border-slate-600 rounded-md text-center'>{index+1}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{match.recipient.username}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{index+1}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{match.recipient.username}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -115,23 +115,23 @@ const Dashboard = () => {
                                 <table className='w-full border-separate border-spacing-2'>
                             <thead>
                                 <tr>
-                                    <th className='border border-slate-600 rounded-md'>#</th>
-                                    <th className='border border-slate-600 rounded-md'>Appointment Time</th>
-                                    <th className='border border-slate-600 rounded-md'>Contact</th>
-                                    <th className='border border-slate-600 rounded-md'>Options</th>
+                                    <th className='border border-gray-400 rounded-md'>#</th>
+                                    <th className='border border-gray-400 rounded-md'>Appointment Time</th>
+                                    <th className='border border-gray-400 rounded-md'>Contact</th>
+                                    <th className='border border-gray-400 rounded-md'>Options</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {incomingRequests.map((match, index) => (
                                     <tr key={match._id} className='h-8'>
-                                        <td className='border border-slate-600 rounded-md text-center'>{index+1}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{match.requester.username}</td>
-                                        <td className='flex border border-slate-600 rounded-md justify-center'>
-                                            <button className='text-3xl text-green-400 mr-16' onClick={() => {handleApprove(match._id)}}>
+                                        <td className='border border-gray-400 rounded-md text-center'>{index+1}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{match.requester.username}</td>
+                                        <td className='flex border border-gray-400 rounded-md justify-center'>
+                                            <button className='text-3xl text-blue-600 mr-16' onClick={() => {handleApprove(match._id)}}>
                                                 <MdCheck  />
                                             </button>
-                                            <button className='text-3xl text-red-600' onClick={() => {handleReject(match._id)}}>
+                                            <button className='text-3xl text-gray-500' onClick={() => {handleReject(match._id)}}>
                                                 <MdClose />
                                             </button>
                                         </td>
@@ -143,22 +143,22 @@ const Dashboard = () => {
                             </tr>
                         </tbody>
                     </table>
-                    <h1 className='text-3xl text-center mt-20 mb-3'>Approved</h1>
+                    <h1 className='text-3xl text-blue-600 text-center mt-20 mb-3'>Approved</h1>
                     <table className='w-full border-separate border-spacing-2'>
                         <thead>
                             <tr>
-                                <th className='border border-slate-600 rounded-md'>#</th>
-                                <th className='border border-slate-600 rounded-md'>Appointment Time</th>
-                                <th className='border border-slate-600 rounded-md'>Contact</th>
+                                <th className='border border-gray-400 rounded-md'>#</th>
+                                <th className='border border-gray-400 rounded-md'>Appointment Time</th>
+                                <th className='border border-gray-400 rounded-md'>Contact</th>
                             </tr>
                         </thead>
                         <tbody>
                             {
                                 user && approvedRequests.map((match, index) => (
                                     <tr key={match._id} className='h-8'>
-                                        <td className='border border-slate-600 rounded-md text-center'>{index+1}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
-                                        <td className='border border-slate-600 rounded-md text-center'>{user._id == match.recipient._id ? `${match.requester.username}` : `${match.recipient.username}`}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{index+1}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{`${match.dateObj.getMonth() + 1}/${match.dateObj.getDate()}/${match.dateObj.getFullYear()} at ${match.dateObj.getHours()}:${match.dateObj.getMinutes().toString().padStart(2, '0')}`}</td>
+                                        <td className='border border-gray-400 rounded-md text-center'>{user._id === match.recipient._id ? `${match.requester.username}` : `${match.recipient.username}`}</td>
                                     </tr>
                                 ))
                             }
