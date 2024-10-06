@@ -1,64 +1,88 @@
-import React, { useEffect } from 'react'
-import Dashboard from './Dashboard'
+import React, { useEffect, useState } from 'react';
+import Dashboard from './Dashboard';
 import MatchFinding from './MatchFinding';
-import { useState } from 'react';
 import { useUser } from '../components/UserContext';
 import useRedirect from '../hooks/RedirectToLogin';
 import { MdAdd } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 
 const Home = () => {
-    const [showState, setShowState] = useState("dashboard");
-    const { user, logout } = useUser();
+  const [showState, setShowState] = useState('dashboard');
+  const { user, logout } = useUser();
 
-    useRedirect();
+  useRedirect();
 
-    return (
-        <div>
-            {/* Navigation Buttons */}
-            <div className='flex justify-center items-center gap-x-4 mt-4'>
-                <button
-                    className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-lg'
-                    onClick={() => setShowState("dashboard")}
-                >
-                    Dashboard
-                </button>
-                <button
-                    className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-lg'
-                    onClick={() => setShowState("matchfinding")}
-                >
-                    Matchfinding
-                </button>
+  return (
+    <div className='min-h-screen bg-background'>
+      {/* Header */}
+      <header className='bg-white shadow-md'>
+        <div className='container mx-auto px-4 py-4 flex items-center justify-between'>
+          {/* Logo or App Name */}
+          <h1 className='text-2xl font-semibold text-primary'>
+            SkillMatcher
+          </h1>
+
+          {/* Navigation */}
+          <nav className='flex items-center space-x-6'>
+            <button
+              className={`text-lg font-medium ${
+                showState === 'dashboard'
+                  ? 'text-primary underline underline-offset-4'
+                  : 'text-gray-600 hover:text-primary transition duration-200'
+              }`}
+              onClick={() => setShowState('dashboard')}
+            >
+              Dashboard
+            </button>
+            <button
+              className={`text-lg font-medium ${
+                showState === 'matchfinding'
+                  ? 'text-primary underline underline-offset-4'
+                  : 'text-gray-600 hover:text-primary transition duration-200'
+              }`}
+              onClick={() => setShowState('matchfinding')}
+            >
+              Matchfinding
+            </button>
+
+            {/* Create Buttons */}
+            <Link
+              to='../matches/create'
+              className='text-primary hover:text-secondary transition duration-200'
+              aria-label='Create Match'
+            >
+              <MdAdd size={28} />
+            </Link>
+            <Link
+              to='../skills/create'
+              className='text-primary hover:text-secondary transition duration-200'
+              aria-label='Create Skill'
+            >
+              <MdAdd size={28} />
+            </Link>
+
+            {/* User Info */}
+            <div className='flex items-center space-x-2'>
+              <span className='text-gray-800 font-medium'>
+                {user ? user.username : ''}
+              </span>
+              <button
+                onClick={logout}
+                className='bg-primary hover:bg-secondary text-white font-semibold py-1 px-3 rounded-md transition duration-200'
+              >
+                Logout
+              </button>
             </div>
-
-            {/* Header with Username and Icons */}
-            <div className='flex flex-row items-center mt-6'>
-                <h1 className='text-4xl ml-4 font-semibold text-gray-800'>
-                    {user ? `${user.username}` : ""}
-                </h1>
-                <div className='flex-grow' />
-                <Link to={"../matches/create"} className='mr-4'>
-                    <MdAdd className='text-4xl text-blue-600 hover:text-blue-700' />
-                </Link>
-                <Link to={"../skills/create"} className='mr-4'>
-                    <MdAdd className='text-4xl text-blue-600 hover:text-blue-700' />
-                </Link>
-            </div>
-
-            {/* Content Display */}
-            {showState === "matchfinding" ? <MatchFinding /> : <Dashboard />}
-
-            {/* Logout Button */}
-            <div className='flex justify-center my-12'>
-                <button
-                    onClick={logout}
-                    className='border-2 border-gray-400 bg-white text-gray-600 hover:bg-gray-100 rounded-md p-3'
-                >
-                    Logout
-                </button>
-            </div>
+          </nav>
         </div>
-    )
-}
+      </header>
 
-export default Home
+      {/* Main Content */}
+      <main className='container mx-auto px-4 py-8'>
+        {showState === 'matchfinding' ? <MatchFinding /> : <Dashboard />}
+      </main>
+    </div>
+  );
+};
+
+export default Home;
