@@ -61,18 +61,15 @@ const MatchFinding = () => {
         findMatch(); // Fetch the first skill on component mount
     }, []);
 
-    // Fetch skills only when needed (when showModal becomes true)
     useEffect(() => {
-        if (showModal && !skills.length) {
-            setLoading(true);
-            axios.get('http://localhost:1155/skills/mySkills', { withCredentials: true })
-                .then(response => {
-                    setSkills(response.data.skills);
-                })
-                .catch(error => console.log(error))
-                .finally(() => setLoading(false));
-        }
-    }, [showModal, skills.length]);
+      setLoading(true);
+      axios.get('http://localhost:1155/skills/mySkills', { withCredentials: true })
+          .then(response => {
+              setSkills(response.data.skills);
+          })
+          .catch(error => console.log(error))
+          .finally(() => setLoading(false));
+    }, []);
 
     const renderModal = useCallback(() => {
         if (skills.length === 0) {
